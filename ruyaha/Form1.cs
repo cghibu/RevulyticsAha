@@ -33,7 +33,8 @@ namespace ruyaha
         private string authUrl = "https://api.revulytics.com/auth/login";
         private string logoffurl = "https://api.revulytics.com/auth/logout";
         private string featureuUsageURL = "https://api.revulytics.com/reporting/eventTracking/advanced/fullReport";
-        private string reporturl = "https://analytics.revulytics.com/dashboard/events_full?page_id=2936724257118231&json_filters=%7B%7D&date_split=day&old_stop_date=2017-01-29&product_id=";
+        private string reportUrlPart1 = "https://analytics.revulytics.com/dashboard/events_full?page_id=2936724257118231&json_filters=%7B%7D&date_split=day&old_stop_date=";
+        private string reportUrlPart2 = @"&product_id=";
         //Aha URLs
         string featuresURL = "https://secure.aha.io/api/v1/releases/"; // to concatenate with the project id and "/features/
         string ahaFeatureDetailsURL= "https://secure.aha.io/api/v1/features/"; //to concatenate with the feature ID.
@@ -130,7 +131,7 @@ namespace ruyaha
                     }
                 }
             }
-            MessageBox.Show("Aha! infomration successfuly retrieved.");
+            MessageBox.Show("Aha! information successfuly retrieved.");
         }
 
  //----------------------------------------------------------------------------------
@@ -164,10 +165,11 @@ namespace ruyaha
                 //build request object
 
                 RuiAdvancedRequest advancedRequest = new RuiAdvancedRequest();
+                DateTime startDate = DateTime.Now.AddDays(-90);
                 advancedRequest.user = textBox3.Text;
                 advancedRequest.sessionId = authResponseObj.sessionId;
                 advancedRequest.productId = Convert.ToInt64(textBox1.Text);
-                advancedRequest.startDate = "2016-11-01";
+                advancedRequest.startDate = startDate.ToString("yyyy-MM-dd");
                 advancedRequest.stopDate = DateTime.Now.Date.ToString("yyyy-MM-dd");
                 // advancedRequest.globalFilters = "null";
                 // advancedRequest.segmentBy = "null";
@@ -218,6 +220,7 @@ namespace ruyaha
                             decimal rate = ((decimal)dReport.data.uniqueUsersUsedAtLeastOnce / (decimal)(dReport.data.uniqueUsersUsedAtLeastOnce + dReport.data.uniqueUsersNeverUsed)) * 100;
                             rate = Math.Round(rate, 2);
                             listView1.Items[i].SubItems.Add(rate.ToString());
+                            listView1.Items[i].SubItems.Add(dReport.data.uniqueUsersUsedAtLeastOnce.ToString());
                         }
                     }
 
@@ -280,7 +283,7 @@ namespace ruyaha
             client.Headers.Add("Content-Type", "application/json");
             client.Headers.Add("Accept", "application/json");
         }
-        public FeatureDetailRoorObject SetAhaCustomFieldValues(FeatureDetailRoorObject featureToUpdate,CustomField customFieldToUpdate, string valueToUpdate, string urlValue)
+        public FeatureDetailRoorObject SetAhaCustomFieldValues(FeatureDetailRoorObject featureToUpdate,CustomField customFieldToUpdate, string valueToUpdate, string urlValue, string customers)
         {
             string specificFeatureURL = featuresURL + textBox6.Text + @"/features/";
 
@@ -293,6 +296,7 @@ namespace ruyaha
                 UrCustomField cFieldToSerialize = new UrCustomField();
                 cFieldToSerialize.base_feature_adoption_rate = valueToUpdate;
                 cFieldToSerialize.rui_url = urlValue;
+                cFieldToSerialize.customers_using_base_feature = customers;
                 UrFeature featureToSerialize = new UrFeature();
                 featureToSerialize.custom_fields = cFieldToSerialize;
 
@@ -346,7 +350,7 @@ namespace ruyaha
                 bool found = false;
                 for (int i = 0; i < listView1.Items.Count; i++)
                 {
-                    if (listView1.Items[i].SubItems.Count == 3)
+                    if (listView1.Items[i].SubItems.Count == 4)
                     {
                         found = true;
                         break;
@@ -378,20 +382,17 @@ namespace ruyaha
                                 if (cField != null)
                                 {
 
-                                    //  FeatureDetailRoorObject enumDetailstoUpdate = GetAhaFeatureDetails(enumRootObject.features[i]);
                                     string toLook4 = cField.value.ToString();
                                     ListViewItem item = listView1.FindItemWithText(toLook4);
                                     string rate = item.SubItems[2].Text;
+                                    string customers = item.SubItems[3].Text;
                                     CustomField fieldToUpdate = new CustomField();
                                     fieldToUpdate = enumDetails.feature.custom_fields.Find(x => x.name.Equals("Base feature adoption rate"));
                                     if (fieldToUpdate != null)
                                     {
-
-                                        string urlValue = reporturl + textBox1.Text;
-                                        FeatureDetailRoorObject result = SetAhaCustomFieldValues(enumDetails, cField, rate, urlValue);
+                                        string urlValue = reportUrlPart1 +DateTime.Now.ToString("yyyy-MM-dd") + reportUrlPart2 + textBox1.Text;
+                                        FeatureDetailRoorObject result = SetAhaCustomFieldValues(enumDetails, cField, rate, urlValue,customers);
                                     }
-
-
                                 }
                             }
                         }
@@ -682,10 +683,11 @@ public class EnumFeature
             }
     // classes for composing JSON for updating custom fields in AHA features
 
-        public class UrCustomField
+        public class UrCustomField //custom fields to update
             {
                 public string base_feature_adoption_rate { get; set; }
                 public string rui_url { get; set; }
+                public string customers_using_base_feature { get; set; }
             }
         public class UrFeature
             {
