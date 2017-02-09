@@ -107,7 +107,7 @@
             // 
             // columnHeader3
             // 
-            this.columnHeader3.Text = "Base Aha! Feature Usage (RUY)";
+            this.columnHeader3.Text = "Base Aha! Feature Usage (RUI)";
             this.columnHeader3.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.columnHeader3.Width = 166;
             // 
@@ -186,7 +186,6 @@
             this.textBox2.PasswordChar = '*';
             this.textBox2.Size = new System.Drawing.Size(126, 20);
             this.textBox2.TabIndex = 9;
-            this.textBox2.Text = "absalomam1ziras8IY";
             // 
             // textBox3
             // 
@@ -195,7 +194,6 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(126, 20);
             this.textBox3.TabIndex = 10;
-            this.textBox3.Text = "calin@temasoft.com";
             // 
             // label5
             // 
@@ -225,7 +223,6 @@
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(126, 20);
             this.textBox4.TabIndex = 13;
-            this.textBox4.Text = "cghibu@gmail.com";
             // 
             // label7
             // 
@@ -245,7 +242,6 @@
             this.textBox5.PasswordChar = '*';
             this.textBox5.Size = new System.Drawing.Size(126, 20);
             this.textBox5.TabIndex = 15;
-            this.textBox5.Text = "absalomam1ziras8IY";
             // 
             // label8
             // 
@@ -312,7 +308,7 @@
             this.Controls.Add(this.button1);
             this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Revulytics - Aha! Integration Prototype";
             this.ResumeLayout(false);
             this.PerformLayout();
 
